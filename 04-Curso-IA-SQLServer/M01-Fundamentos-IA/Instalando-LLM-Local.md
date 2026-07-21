@@ -1,5 +1,4 @@
-## Workshop SQL Server Expert - 4ª Edição
-### Construa Soluções com IA Dentro do SQL Server 2025
+## Formação SQL AI Expert
 
 ### ▶️ Instalando e Configurando LLM
 
@@ -47,12 +46,12 @@ ollama rm llama3.2:1b
 
 **Command Prompt:** Teste utilizando Modelo de Chat com pergunta sobre índices.
 ```cmd
-curl -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente que explica conceitos do banco de dados Microsoft SQL Server de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" http://localhost:11434/api/chat
+curl -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente especializado em bancos de dados Microsoft SQL Server que explica conceitos de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" http://localhost:11434/api/chat
 ```
 
 **Command Prompt:** Teste utilizando Modelo de Chat com SSL, requisito para utilizar no SQL Server.
 ```cmd
-curl --ssl-no-revoke -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente que explica conceitos do banco de dados Microsoft SQL Server de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" https://localhost/api/chat
+curl --ssl-no-revoke -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente especializado em bancos de dados Microsoft SQL Server que explica conceitos de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" https://localhost/api/chat
 ```
 
 

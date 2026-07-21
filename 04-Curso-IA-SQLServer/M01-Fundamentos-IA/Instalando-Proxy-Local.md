@@ -1,5 +1,4 @@
-## Workshop SQL Server Expert - 4ª Edição
-### Construa Soluções com IA Dentro do SQL Server 2025
+## Formação SQL AI Expert
 
 ### ▶️ Instalando e Configurando Proxy Local Candy
 
@@ -81,7 +80,7 @@ Get-ChildItem Cert:\LocalMachine\Root | Where-Object { $_.Subject -like "*Caddy*
 
 **Command Prompt:** Teste utilizando Modelo de Chat via Proxy Caddy com pergunta sobre índices.
 ```cmd
-curl --ssl-no-revoke -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente que explica conceitos do banco de dados Microsoft SQL Server de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" https://localhost/api/chat
+curl --ssl-no-revoke -H "Content-Type: application/json" -d "{\"model\":\"llama3.2:1b\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um assistente especializado em bancos de dados Microsoft SQL Server que explica conceitos de forma clara e objetiva.\"},{\"role\":\"user\",\"content\":\"Explique a diferença entre índices clusterizados e índices não clusterizados no SQL Server.\"}],\"stream\":false}" https://localhost/api/chat
 ```
 
 
@@ -108,8 +107,8 @@ DECLARE @payload NVARCHAR(MAX) = N'{
     "model": "llama3.2:1b",
     "options": {"temperature":0.3},
     "messages": [
-        {"role": "system", "content": "Você é um assistente especialista em SQL Server."},
-        {"role": "user",   "content": "Explique o que é TempDB"}
+        {"role": "system", "content": "Você é um assistente especializado em bancos de dados Microsoft SQL Server que explica conceitos de forma clara e objetiva."},
+        {"role": "user",   "content": "Explique o que é o Banco de Dados de Sistema TempDB"}
     ],
     "stream": false
 }'
