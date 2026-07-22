@@ -89,7 +89,7 @@ Agora vamos testar o acesso a LLM via Caddy de dentro do SQL Server.
 Abra o **Management Studio**, em uma janela de Query, cole e execute o comando abaixo:
 
 ```sql
-use Landry_Blogs
+use Aula
 go
 
 -- Habilitar preview features (necessário no SQL Server 2025)
