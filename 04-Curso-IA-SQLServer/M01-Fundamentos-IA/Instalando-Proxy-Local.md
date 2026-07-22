@@ -43,7 +43,7 @@ localhost, 127.0.0.1 {
 }
 ```
 
-**Carregando o Candy**
+**Carregando o Caddy**
 
 Agora em uma janela de **Prompt (Command Window)** execute a partir da mesma pasta do arquivo criado acima. Aparecendo uma janela confirmando a instalação de um certificado local responda "Yes".
 ```text
