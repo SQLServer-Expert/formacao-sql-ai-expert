@@ -1,4 +1,5 @@
-**Banco de Dados de Sistema TempDB**  O Banco de Dados de Sistema TempDB é uma estrutura de dados que permite armazenar e manipular dados temporários, sem a necessidade de manuseio permanente dos dados. Ele é uma ferramenta poderosa para realizar tarefas como:  
+**Banco de Dados de Sistema TempDB**  
+O Banco de Dados de Sistema TempDB é uma estrutura de dados que permite armazenar e manipular dados temporários, sem a necessidade de manuseio permanente dos dados. Ele é uma ferramenta poderosa para realizar tarefas como:  
 *   Armazenamento de dados em tempo real 
 *   Processamento de dados em tempo real 
 *   Análise de dados em tempo real  
