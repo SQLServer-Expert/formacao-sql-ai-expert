@@ -76,6 +76,9 @@ go
  Prompt Sistema: Role Prompting
  Prompt Usuário: Zero-shot
 ********************************************/
+-- Execute o Proxy Local Caddy antes:
+-- c:\caddy\caddy_windows_amd64.exe run --config c:\caddy\Caddyfile
+
 EXEC dbo.spAI_Chat_Ollama 
 @pSystem = N'
 Você é um assistente especializado em bancos de dados Microsoft SQL Server 
