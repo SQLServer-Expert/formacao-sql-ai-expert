@@ -12,7 +12,7 @@ Ambiente:
 - Ollama
 - Caddy
 
-Autor: Prof. Landry | SQL Server Expert
+Autor: Landry Duailibe | SQL Server Expert
 ===============================================================================
 */
 
