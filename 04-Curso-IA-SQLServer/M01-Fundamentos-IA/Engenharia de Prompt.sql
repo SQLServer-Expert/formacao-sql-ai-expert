@@ -1,4 +1,20 @@
+/*
+===============================================================================
+Formação SQL AI Expert
+Aula   : Engenharia de Prompt
 
+Objetivo:
+Demonstrar o uso dos prompts de sistema e usuário em chamadas para uma
+LLM local utilizando SQL Server, Ollama e Caddy.
+
+Ambiente:
+- SQL Server 2025
+- Ollama
+- Caddy
+
+Autor: Prof. Landry | SQL Server Expert
+===============================================================================
+*/
 
 use Aula
 go
@@ -61,16 +77,6 @@ go
  Prompt Sistema: Role Prompting
  Prompt Usuário: Zero-shot
 ********************************************/
-DECLARE @System nvarchar(max) = N'
-Você é um assistente especializado em bancos de dados Microsoft SQL Server 
-que explica conceitos de forma clara e objetiva'
-
-DECLARE @pUser nvarchar(max) = N'Explique o que é o Banco de Dados de Sistema TempDB'
-
-EXEC dbo.spAI_Chat_Ollama @pSystem = @System, @pUser = @pUser
-go
-
--- Ajustando a saída
 EXEC dbo.spAI_Chat_Ollama 
 @pSystem = N'
 Você é um assistente especializado em bancos de dados Microsoft SQL Server 
@@ -104,6 +110,7 @@ EXEC dbo.spAI_Chat_Ollama
 Você é um professor especializado em Microsoft SQL Server.
 Explique os conceitos em português, utilizando linguagem clara e objetiva.
 Sempre que possível, utilize exemplos relacionados ao trabalho de DBAs e desenvolvedores SQL.',
+
 @pUser = '
 Explique o que é o banco de dados de sistema TempDB para um desenvolvedor SQL iniciante.
 
