@@ -15,7 +15,6 @@ Ambiente:
 Autor: Landry Duailibe | SQL Server Expert
 ===============================================================================
 */
-
 use Aula
 go
 
