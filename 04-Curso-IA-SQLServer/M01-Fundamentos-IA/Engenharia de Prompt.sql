@@ -1,7 +1,7 @@
 /*
 ===============================================================================
 Formação SQL AI Expert
-Aula   : Engenharia de Prompt
+Aula : Engenharia de Prompt
 
 Objetivo:
 Demonstrar o uso dos prompts de sistema e usuário em chamadas para uma
