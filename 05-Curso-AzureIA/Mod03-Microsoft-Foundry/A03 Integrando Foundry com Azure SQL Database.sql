@@ -2,7 +2,7 @@ use Landry_Blogs
 go
 -- Habilitando o uso do recurso de endpoint externo no SQL Server
 EXECUTE sp_configure 'external rest endpoint enabled', 1;
-RECONFIGURE;
+RECONFIGURE; 
 
 -- Requisito criar uma Database Master Key
 DROP MASTER KEY
