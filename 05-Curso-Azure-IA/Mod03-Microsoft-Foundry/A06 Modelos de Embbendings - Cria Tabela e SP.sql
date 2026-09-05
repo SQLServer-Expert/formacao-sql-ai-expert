@@ -40,6 +40,10 @@ ALTER TABLE dbo.BlogChunks ADD CONSTRAINT FK_BlogChunks_BlogPosts
 FOREIGN KEY (PostId) REFERENCES dbo.BlogPosts(PostId)
 go
 
+CREATE VECTOR INDEX ix_BlogChunks_Embedding_ANN
+ON dbo.BlogChunks (Embedding)
+WITH (METRIC = 'cosine', TYPE = 'diskann')
+go
 
 /***********************************************
  Cria Stored Procedure para gerar Chunks
