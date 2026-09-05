@@ -1,108 +1,235 @@
-# Como usar `DBCC CHECKDB` no SQL Server  
-O `DBCC CHECKDB` verifica a integridade lógica e física de um banco de dados, incluindo:  
-- Páginas e estruturas internas; 
-- Índices; 
-- Integridade de alocação; 
-- Consistência entre tabelas e objetos; 
-- Problemas de corrupção de dados.  
+# Tabelas Temporais no SQL Server
 
-## Verificar o banco atual  
-```sql 
-DBCC CHECKDB; 
-```  
+Tabelas temporais, ou **system-versioned temporal tables**, permitem manter automaticamente o histórico das alterações de uma tabela.
 
-## Verificar um banco específico  
-```sql 
-DBCC CHECKDB (N'MeuBanco'); 
-```  
-Uma opção comum para reduzir a quantidade de mensagens informativas é:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH NO_INFOMSGS; 
-```  
-Para exibir todas as mensagens de erro:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH ALL_ERRORMSGS; 
-```  
+Elas são úteis para responder perguntas como:
 
-## Verificação física mais rápida  
-A opção `PHYSICAL_ONLY` concentra a verificação em estruturas físicas, como páginas, cabeçalhos e checksums:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH PHYSICAL_ONLY, NO_INFOMSGS; 
-```  
-Ela costuma ser usada para verificações frequentes, pois geralmente exige menos recursos. Porém, não substitui uma execução completa do `CHECKDB`.  
+- Qual era o valor de um registro em determinada data?
+- Quem tinha determinado endereço antes de uma alteração?
+- Quais registros existiam em um período?
+- Quando um registro foi alterado ou excluído?
 
-## Estimar o espaço necessário  
-Para estimar o espaço necessário no `tempdb`:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH ESTIMATEONLY; 
-```  
+> O recurso está disponível a partir do SQL Server 2016. Ele não deve ser confundido com tabelas temporárias como `#Tabela`, que existem apenas durante uma sessão.
 
-## Verificar uma tabela específica  
-```sql 
-DBCC CHECKTABLE (N'MinhaTabela') WITH NO_INFOMSGS; 
-```  
+## Como funcionam
 
-## Interpretar o resultado  
-Se o banco estiver íntegro, normalmente será exibida uma mensagem semelhante a:  
-```text 
-CHECKDB found 0 allocation errors and 0 consistency errors in database ... 
-```  
-Se forem encontrados erros, o SQL Server exibirá mensagens indicando:  
-- O objeto afetado; 
-- A página ou índice envolvido; 
-- O tipo de corrupção; 
-- Uma sugestão de reparo, quando aplicável.  
+Uma tabela temporal possui:
 
-Também é possível consultar o log de erros do SQL Server:  
-```sql 
-EXEC sys.xp_readerrorlog; 
-```  
+1. Uma tabela principal, com os dados atuais.
+2. Uma tabela de histórico, gerenciada pelo SQL Server.
+3. Duas colunas que representam o período de validade do registro:
+   - início da validade;
+   - fim da validade.
 
-## Opções de reparo  
-O `DBCC CHECKDB` possui opções de reparo, mas elas devem ser usadas com muita cautela:  
-```sql 
-DBCC CHECKDB (N'MeuBanco', REPAIR_REBUILD) WITH NO_INFOMSGS; 
-```  
-Ou:  
-```sql 
-DBCC CHECKDB (N'MeuBanco', REPAIR_ALLOW_DATA_LOSS) WITH NO_INFOMSGS; 
-```  
+Quando um registro é atualizado:
 
-### `REPAIR_REBUILD`  
-Pode corrigir alguns problemas sem perda de dados, principalmente relacionados a índices. Mesmo assim, deve ser usado somente após análise do problema.  
+- a versão anterior é movida para a tabela de histórico;
+- a nova versão permanece na tabela principal.
 
-### `REPAIR_ALLOW_DATA_LOSS`  
-Pode remover páginas, linhas ou objetos corrompidos. Apesar do nome, essa opção pode causar perda de dados e não deve ser a primeira alternativa.  Antes de usá-la:  
-1. Faça um backup do banco; 
-2. Tente restaurar um backup íntegro mais recente; 
-3. Execute o `CHECKDB` em uma cópia restaurada; 
-4. Avalie os erros e o impacto da perda de dados; 
-5. Coloque o banco em modo de usuário único, se solicitado pelo SQL Server.  
+Quando um registro é excluído:
 
-Exemplo de modo de usuário único:  
-```sql 
-ALTER DATABASE [MeuBanco] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; 
-```  
+- a versão excluída é armazenada no histórico.
 
-Após o reparo:  
-```sql 
-ALTER DATABASE [MeuBanco] SET MULTI_USER; 
-```  
+## Criando uma tabela temporal
 
-## Recomendações práticas  
-- Execute o `CHECKDB` regularmente; 
-- Prefira executá-lo em horários de menor utilização; 
-- Monitore o uso de CPU, I/O e `tempdb`; 
-- Não use `REPAIR_ALLOW_DATA_LOSS` como procedimento padrão; 
-- A melhor forma de corrigir corrupção normalmente é restaurar um backup íntegro; 
-- Valide periodicamente se os backups podem ser restaurados.  
+```sql
+CREATE TABLE dbo.Cliente
+(
+    ClienteId int NOT NULL
+        CONSTRAINT PK_Cliente PRIMARY KEY,
 
-Uma execução comum em ambiente de produção seria:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH NO_INFOMSGS, ALL_ERRORMSGS; 
-```  
-Para uma verificação física frequente:  
-```sql 
-DBCC CHECKDB (N'MeuBanco') WITH PHYSICAL_ONLY, NO_INFOMSGS; 
-```  
-A execução exige, em geral, permissões de `sysadmin` ou `db_owner`.
+    Nome varchar(100) NOT NULL,
+    Email varchar(200) NULL,
+
+    ValidFrom datetime2(7)
+        GENERATED ALWAYS AS ROW START
+        CONSTRAINT DF_Cliente_ValidFrom
+        DEFAULT SYSUTCDATETIME()
+        NOT NULL,
+
+    ValidTo datetime2(7)
+        GENERATED ALWAYS AS ROW END
+        CONSTRAINT DF_Cliente_ValidTo
+        DEFAULT CONVERT(datetime2(7), '9999-12-31 23:59:59.9999999')
+        NOT NULL,
+
+    PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo)
+)
+WITH
+(
+    SYSTEM_VERSIONING = ON,
+    HISTORY_TABLE = dbo.ClienteHistorico
+);
+```
+
+Nesse exemplo:
+
+- `dbo.Cliente` contém os dados atuais;
+- `dbo.ClienteHistorico` contém as versões anteriores;
+- `ValidFrom` e `ValidTo` são controladas pelo SQL Server;
+- os horários são registrados em UTC.
+
+## Inserindo e alterando dados
+
+A utilização de `INSERT`, `UPDATE` e `DELETE` é semelhante à de uma tabela comum:
+
+```sql
+INSERT INTO dbo.Cliente (ClienteId, Nome, Email)
+VALUES (1, 'Maria', 'maria@exemplo.com');
+```
+
+```sql
+UPDATE dbo.Cliente
+SET Email = 'maria.novo@exemplo.com'
+WHERE ClienteId = 1;
+```
+
+Após o `UPDATE`, a versão anterior do cliente será armazenada automaticamente na tabela de histórico.
+
+## Consultando os dados atuais
+
+Sem nenhuma cláusula especial, a consulta retorna somente os dados atuais:
+
+```sql
+SELECT *
+FROM dbo.Cliente;
+```
+
+## Consultando o histórico
+
+### Todas as versões
+
+```sql
+SELECT *
+FROM dbo.Cliente
+FOR SYSTEM_TIME ALL
+WHERE ClienteId = 1
+ORDER BY ValidFrom;
+```
+
+Essa consulta pode retornar:
+
+- a versão atual;
+- versões anteriores;
+- registros que foram excluídos.
+
+### Estado em uma data específica
+
+```sql
+SELECT *
+FROM dbo.Cliente
+FOR SYSTEM_TIME AS OF '2025-01-15 10:30:00'
+WHERE ClienteId = 1;
+```
+
+`AS OF` retorna o estado que a tabela tinha naquele instante.
+
+### Registros válidos em um intervalo
+
+```sql
+SELECT *
+FROM dbo.Cliente
+FOR SYSTEM_TIME BETWEEN
+    '2025-01-01 00:00:00'
+    AND '2025-01-31 23:59:59'
+WHERE ClienteId = 1;
+```
+
+### Versões que estiveram vigentes em um período
+
+```sql
+SELECT *
+FROM dbo.Cliente
+FOR SYSTEM_TIME FROM
+    '2025-01-01 00:00:00'
+TO
+    '2025-02-01 00:00:00'
+WHERE ClienteId = 1;
+```
+
+No caso de `FROM ... TO`, o limite inicial é incluído e o limite final não é incluído.
+
+## Criando uma tabela temporal a partir de uma tabela existente
+
+Para converter uma tabela existente, é necessário adicionar as colunas de período:
+
+```sql
+ALTER TABLE dbo.Cliente
+ADD
+    ValidFrom datetime2(7)
+        GENERATED ALWAYS AS ROW START
+        CONSTRAINT DF_Cliente_ValidFrom
+        DEFAULT SYSUTCDATETIME()
+        NOT NULL,
+
+    ValidTo datetime2(7)
+        GENERATED ALWAYS AS ROW END
+        CONSTRAINT DF_Cliente_ValidTo
+        DEFAULT CONVERT(datetime2(7), '9999-12-31 23:59:59.9999999')
+        NOT NULL;
+```
+
+Depois, adicione o período:
+
+```sql
+ALTER TABLE dbo.Cliente
+ADD PERIOD FOR SYSTEM_TIME (ValidFrom, ValidTo);
+```
+
+Por fim, habilite o versionamento:
+
+```sql
+ALTER TABLE dbo.Cliente
+SET
+(
+    SYSTEM_VERSIONING = ON
+    (
+        HISTORY_TABLE = dbo.ClienteHistorico
+    )
+);
+```
+
+A tabela deve atender aos requisitos do SQL Server, incluindo valores válidos nas colunas de período e uma chave primária.
+
+## Desabilitando o versionamento
+
+É possível desabilitar temporariamente o versionamento:
+
+```sql
+ALTER TABLE dbo.Cliente
+SET (SYSTEM_VERSIONING = OFF);
+```
+
+Depois, ele pode ser reativado:
+
+```sql
+ALTER TABLE dbo.Cliente
+SET
+(
+    SYSTEM_VERSIONING = ON
+    (
+        HISTORY_TABLE = dbo.ClienteHistorico
+    )
+);
+```
+
+Essa operação deve ser feita com cuidado, pois alterações manuais na tabela de histórico podem comprometer a consistência temporal.
+
+## Considerações importantes
+
+- As colunas de período representam o **tempo do sistema**, não necessariamente uma validade de negócio.
+- Os valores são controlados pelo SQL Server enquanto o versionamento está habilitado.
+- Os horários normalmente são registrados em UTC.
+- A tabela de histórico pode crescer bastante; é importante criar índices adequados e definir uma estratégia de retenção.
+- O histórico não substitui uma auditoria completa. Por exemplo, as colunas temporais não identificam automaticamente qual usuário realizou a alteração.
+- Consultas temporais devem utilizar `FOR SYSTEM_TIME` imediatamente após o nome da tabela:
+
+```sql
+SELECT *
+FROM dbo.Cliente
+FOR SYSTEM_TIME ALL;
+```
+
+## Resumo
+
+Em resumo, tabelas temporais são uma forma nativa do SQL Server de manter versões dos dados e consultar o estado atual ou histórico de uma tabela sem precisar implementar gatilhos manualmente.

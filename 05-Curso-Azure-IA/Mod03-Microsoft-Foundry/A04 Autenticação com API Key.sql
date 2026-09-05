@@ -96,16 +96,15 @@ EXEC @returnValue = sp_invoke_external_rest_endpoint
 -- Tratamento de Erro
 IF @returnValue = 0
 BEGIN
-    SELECT 
-        JSON_VALUE(@response, '$.result.choices[0].message.content') 
-        AS Answer;
+    SELECT Answer
+    FROM OPENJSON(@response, '$.result.choices[0].message')
+    WITH (Answer nvarchar(max) '$.content')
+
 END
 ELSE
 BEGIN
-    SELECT 
-        @returnValue AS HttpStatus,
-        JSON_VALUE(@response, '$.response.status.http.description') 
-        AS Error;
+    SELECT @returnValue AS HttpStatus,
+    JSON_VALUE(@response, '$.response.status.http.description') AS Error
 END
 go
 /************************** FIM SP *****************************/

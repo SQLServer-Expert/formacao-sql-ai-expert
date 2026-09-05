@@ -25,8 +25,8 @@ CREATE or ALTER PROC dbo.ia_RAG_Foundry
 
   Chamada:
   EXEC dbo.ia_RAG_Foundry 
-  @Pergunta = N'Como usar DBCC CHECKDB no SQL Server?',
-  @TopDocumentos = 8,
+  @Pergunta = N'O que é e como utilizar Tabelas Temporais no SQL Server',
+  @TopDocumentos = 5,
   @vModelo = N'gpt-5.6-luna',
   @vTemp = N'1'
 ==============================================================================*/
