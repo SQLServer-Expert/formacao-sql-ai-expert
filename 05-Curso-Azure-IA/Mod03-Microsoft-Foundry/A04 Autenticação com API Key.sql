@@ -34,10 +34,9 @@ SECRET = '{"api-key":"<APIKey-do-Projeto>"}'
 
 
 /********************************************
- Stored Procedure ia_Chat_Foundry_APIKey
- - max_tokens: 
+ Stored Procedure ia_Chat_Foundry
 *********************************************/
-EXEC dbo.ia_Chat_Foundry_APIKey 
+EXEC dbo.ia_Chat_Foundry 
 @Modelo = N'gpt-5.6-luna',
 @Temperatura = N'1', -- Para este modelo tem que ser valor 1
 @Prompt_Sistema = N'
@@ -54,7 +53,7 @@ Regras obrigatórias:
 @Prompt_Usuario = N'Como usar DBCC CHECKDB no SQL Server?'
 
 go
-CREATE or ALTER PROC dbo.ia_Chat_Foundry_APIKey
+CREATE or ALTER PROC dbo.ia_Chat_Foundry
 @Modelo nvarchar(200) = 'gpt-5.6-luna',
 @Temperatura nvarchar(10) = '1',
 @Prompt_Sistema nvarchar(4000),
