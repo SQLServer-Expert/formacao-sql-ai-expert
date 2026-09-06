@@ -1,174 +1,207 @@
-# Tabelas temporais no SQL Server
+# Tabelas Temporais no SQL Server
 
-A base de conhecimento fornecida trata de problemas relacionados à **TempDB**, que é diferente de **tabelas temporais**.
+Uma **Tabela Temporal** é uma tabela que mantém automaticamente o histórico das alterações realizadas em seus registros.
 
-- **TempDB**: banco de sistema usado para operações temporárias, ordenações, tabelas temporárias etc.
-- **Tabela temporal**: tabela que mantém automaticamente o histórico das alterações feitas nos dados.
+Quando um registro é atualizado ou excluído:
 
-No SQL Server, as tabelas temporais são chamadas de **system-versioned temporal tables**.
+- A versão anterior é armazenada em uma tabela de histórico;
+- A tabela principal mantém os dados atuais;
+- O SQL Server controla automaticamente o período de validade de cada versão;
+- Não é necessário criar triggers ou código adicional para registrar as alterações.
 
-## Como funcionam
+Esse recurso é chamado de **system-versioned temporal table**.
 
-Uma tabela temporal possui:
+## Requisitos
 
-1. Uma tabela principal, com os dados atuais.
-2. Uma tabela de histórico, com as versões anteriores dos registros.
-3. Duas colunas que indicam o período de validade de cada versão:
-   - início da validade;
-   - fim da validade.
+Para utilizar tabelas temporais:
 
-Quando um registro é atualizado ou excluído, o SQL Server move automaticamente a versão anterior para a tabela de histórico.
+- SQL Server **2016 ou superior**;
+- Banco de dados com **compatibility level 130 ou superior**;
+- Uma chave primária na tabela;
+- Duas colunas `datetime2` para controlar o período da linha;
+- As colunas devem ser definidas com `GENERATED ALWAYS`;
+- Deve ser declarado um período com `PERIOD FOR SYSTEM_TIME`.
 
 ## Criando uma tabela temporal
 
 ```sql
 CREATE TABLE dbo.Cliente
 (
-    ClienteId INT NOT NULL
-        CONSTRAINT PK_Cliente PRIMARY KEY,
+    Cliente_ID int NOT NULL PRIMARY KEY,
+    Nome varchar(50) NOT NULL,
+    RendaMensal decimal(10,2) NULL,
 
-    Nome NVARCHAR(150) NOT NULL,
+    RendaAnual AS RendaMensal * 12,
 
-    DataInicio DATETIME2(7)
-        GENERATED ALWAYS AS ROW START
-        CONSTRAINT DF_Cliente_DataInicio
-        DEFAULT SYSUTCDATETIME()
-        NOT NULL,
+    SysStartTime datetime2
+        GENERATED ALWAYS AS ROW START HIDDEN,
 
-    DataFim DATETIME2(7)
-        GENERATED ALWAYS AS ROW END
-        CONSTRAINT DF_Cliente_DataFim
-        DEFAULT CONVERT(
-            DATETIME2(7),
-            '9999-12-31 23:59:59.9999999'
-        )
-        NOT NULL,
+    SysEndTime datetime2
+        GENERATED ALWAYS AS ROW END HIDDEN,
 
-    PERIOD FOR SYSTEM_TIME (DataInicio, DataFim)
+    PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)
 )
 WITH
 (
     SYSTEM_VERSIONING = ON
     (
-        HISTORY_TABLE = dbo.ClienteHistorico,
-        DATA_CONSISTENCY_CHECK = ON
+        HISTORY_TABLE = dbo.Cliente_Hist
     )
 );
 ```
 
 Nesse exemplo:
 
-- `dbo.Cliente` contém os dados atuais.
-- `dbo.ClienteHistorico` armazena as versões anteriores.
-- `DataInicio` e `DataFim` são preenchidas e controladas pelo SQL Server.
-- O período é baseado no relógio do sistema do SQL Server.
+- `Cliente` é a tabela principal;
+- `Cliente_Hist` é a tabela de histórico;
+- `SysStartTime` indica o início da validade da versão;
+- `SysEndTime` indica o fim da validade da versão;
+- `HIDDEN` faz com que as colunas de controle não apareçam em um `SELECT *`.
 
-## Inserindo e alterando dados
+Também é possível deixar o SQL Server criar a tabela de histórico com um nome padrão, omitindo:
 
-A utilização da tabela é semelhante à de uma tabela comum:
+```sql
+HISTORY_TABLE = dbo.Cliente_Hist
+```
+
+## Inserindo dados
 
 ```sql
 INSERT INTO dbo.Cliente
 (
-    ClienteId,
-    Nome
+    Cliente_ID,
+    Nome,
+    RendaMensal
 )
 VALUES
-(
-    1,
-    N'Cliente A'
-);
-
-UPDATE dbo.Cliente
-SET Nome = N'Cliente A - Atualizado'
-WHERE ClienteId = 1;
-
-DELETE FROM dbo.Cliente
-WHERE ClienteId = 1;
+    (1, 'Paulo', 10000.00),
+    (2, 'Ana',   20000.00),
+    (3, 'Katia', 30000.00);
 ```
 
-Após o `UPDATE`, a versão anterior será armazenada automaticamente na tabela de histórico.
+A inserção cria a versão atual do registro na tabela principal.
 
-Após o `DELETE`, o registro excluído também permanecerá disponível no histórico.
+```sql
+SELECT *
+FROM dbo.Cliente;
+```
+
+Como as colunas temporais foram definidas como `HIDDEN`, elas não aparecem no `SELECT *`.
+
+Para visualizá-las, informe as colunas explicitamente:
+
+```sql
+SELECT
+    Cliente_ID,
+    Nome,
+    RendaMensal,
+    RendaAnual,
+    SysStartTime,
+    SysEndTime
+FROM dbo.Cliente;
+```
+
+## Atualizações e exclusões
+
+Ao executar uma atualização:
+
+```sql
+UPDATE dbo.Cliente
+SET RendaMensal = 12000.00
+WHERE Cliente_ID = 1;
+```
+
+O SQL Server:
+
+1. Atualiza o registro na tabela `Cliente`;
+2. Armazena automaticamente a versão anterior em `Cliente_Hist`.
+
+O mesmo ocorre com exclusões:
+
+```sql
+DELETE FROM dbo.Cliente
+WHERE Cliente_ID = 2;
+```
+
+Antes de remover o registro da tabela principal, o SQL Server mantém sua versão no histórico.
 
 ## Consultando o histórico
 
-### Consultar o estado da tabela em um instante específico
+A tabela de histórico pode ser consultada diretamente:
 
 ```sql
-DECLARE @DataConsulta DATETIME2(7) = '2026-01-15 10:00:00';
-
 SELECT *
+FROM dbo.Cliente_Hist;
+```
+
+Também é possível consultar versões temporais usando `FOR SYSTEM_TIME`. Por exemplo, para consultar como a tabela estava em determinado instante:
+
+```sql
+SELECT
+    Cliente_ID,
+    Nome,
+    RendaMensal,
+    SysStartTime,
+    SysEndTime
 FROM dbo.Cliente
-FOR SYSTEM_TIME AS OF @DataConsulta;
+FOR SYSTEM_TIME AS OF '2025-01-01 12:00:00';
 ```
 
-### Consultar todas as versões
+Esse tipo de consulta é útil para auditoria e para descobrir qual era o estado dos dados em uma data específica.
+
+## Habilitando temporalidade em uma tabela existente
+
+Considere uma tabela já criada:
 
 ```sql
-SELECT *
-FROM dbo.Cliente
-FOR SYSTEM_TIME ALL
-WHERE ClienteId = 1
-ORDER BY DataInicio;
+CREATE TABLE dbo.Produto
+(
+    Produto_ID int NOT NULL PRIMARY KEY,
+    Descricao varchar(50) NOT NULL,
+    ValorUnitario decimal(10,2) NULL
+);
 ```
 
-### Consultar versões dentro de um intervalo
+Adicione as colunas de controle e o período:
 
 ```sql
-SELECT *
-FROM dbo.Cliente
-FOR SYSTEM_TIME BETWEEN
-    '2026-01-01 00:00:00'
-    AND '2026-01-31 23:59:59.9999999'
-WHERE ClienteId = 1;
+ALTER TABLE dbo.Produto
+ADD
+    SysStartTime datetime2
+        GENERATED ALWAYS AS ROW START HIDDEN
+        CONSTRAINT DF_SysStart
+        DEFAULT SYSUTCDATETIME(),
+
+    SysEndTime datetime2
+        GENERATED ALWAYS AS ROW END HIDDEN
+        CONSTRAINT DF_SysEnd
+        DEFAULT CONVERT(datetime2, '9999-12-31 23:59:59'),
+
+    PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime);
 ```
 
-Também é possível consultar diretamente a tabela de histórico:
+Em seguida, habilite o versionamento:
 
 ```sql
-SELECT *
-FROM dbo.ClienteHistorico
-WHERE ClienteId = 1
-ORDER BY DataInicio;
-```
-
-Entretanto, normalmente é preferível utilizar `FOR SYSTEM_TIME`, pois ele considera tanto a tabela atual quanto a tabela histórica.
-
-## Desabilitando o versionamento
-
-Para realizar determinadas alterações estruturais, pode ser necessário desabilitar temporariamente o versionamento:
-
-```sql
-ALTER TABLE dbo.Cliente
-SET (SYSTEM_VERSIONING = OFF);
-```
-
-Depois da alteração, o versionamento pode ser reativado, desde que a tabela principal e a tabela de histórico estejam compatíveis:
-
-```sql
-ALTER TABLE dbo.Cliente
+ALTER TABLE dbo.Produto
 SET
 (
     SYSTEM_VERSIONING = ON
     (
-        HISTORY_TABLE = dbo.ClienteHistorico,
-        DATA_CONSISTENCY_CHECK = ON
+        HISTORY_TABLE = dbo.Produto_Hist
     )
 );
 ```
 
-Esse procedimento exige cuidado, pois alterações feitas enquanto o versionamento estiver desligado não serão registradas automaticamente no histórico.
+A partir desse momento, alterações e exclusões feitas em `dbo.Produto` serão registradas automaticamente em `dbo.Produto_Hist`.
 
-## Pontos importantes
+## Quando utilizar
 
-- O histórico é gerenciado automaticamente pelo SQL Server.
-- A tabela temporal não substitui uma estratégia completa de auditoria.
-- Ela registra as versões dos dados, mas não necessariamente informa qual usuário ou aplicação realizou a alteração.
-- A tabela de histórico pode crescer bastante e deve ser monitorada.
-- É recomendável criar índices adequados, principalmente nas colunas de identificação e nas colunas do período.
-- Tabelas temporais não são a mesma coisa que tabelas temporárias, como `#MinhaTabela`, nem estão relacionadas diretamente ao crescimento do log da `tempdb`.
+Tabelas temporais são adequadas quando é necessário:
 
-## Resumo
+- Manter rastreabilidade e auditoria;
+- Consultar o estado dos dados em determinado momento;
+- Registrar automaticamente versões anteriores;
+- Evitar a criação de triggers ou lógica adicional para controle histórico.
 
-Tabelas temporais são úteis quando é necessário consultar **como os dados estavam em determinado momento** ou acompanhar automaticamente o histórico das alterações.
+Em resumo, a tabela principal representa o estado atual dos dados, enquanto a tabela de histórico conserva as versões anteriores gerenciadas automaticamente pelo SQL Server.

@@ -63,3 +63,21 @@ FROM dbo.BlogChunks with (nolock)
 
 SELECT * FROM dbo.BlogChunks with (nolock)
 
+/***************************************/
+go
+DECLARE @Pergunta nvarchar(4000) = N'O que é e como utilizar Tabelas Temporais no SQL Server'
+DECLARE @VetorPergunta vector(1536)
+SET @VetorPergunta = AI_GENERATE_EMBEDDINGS (@Pergunta USE MODEL Embedding_3small)
+
+SELECT TOP (5) bc.ChunkId, bp.Titulo, bc.Chunk_Texto, vs.distance as Distancia
+
+FROM VECTOR_SEARCH (
+TABLE      = dbo.BlogChunks as bc,
+COLUMN     = Embedding,
+SIMILAR_TO = @VetorPergunta,
+METRIC     = 'cosine') as vs
+
+JOIN dbo.BlogPosts bp ON bp.PostId = bc.PostId
+ORDER BY vs.distance
+
+SELECT * FROM dbo.BlogChunks ORDER BY PostId,Chunk_Indice

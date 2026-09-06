@@ -63,7 +63,7 @@ METRIC     = 'cosine'
 ) as vs
 
 JOIN dbo.BlogPosts bp ON bp.PostId = bc.PostId
-
+ORDER BY vs.distance
 
 /* Documentos selecionados para o contexto */
 
