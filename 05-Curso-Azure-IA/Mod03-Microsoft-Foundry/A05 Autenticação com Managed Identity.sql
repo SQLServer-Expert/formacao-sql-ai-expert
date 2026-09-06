@@ -47,4 +47,5 @@ Regras obrigatórias:
 - Se o contexto não for suficiente, informe isso claramente.
 - Responda em português do Brasil.
 - Utilize Markdown.',
-@Prompt_Usuario = N'O que é e como utilizar Tabelas Temporais no SQL Server?'
+@Prompt_Usuario = N'Como e quando utilizar o comando DBCC CHECKDB no SQL Server?'
+--@Prompt_Usuario = N'O que é e como utilizar Tabelas Temporais no SQL Server?'
