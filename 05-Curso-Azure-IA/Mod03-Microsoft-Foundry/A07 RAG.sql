@@ -26,9 +26,13 @@ CREATE or ALTER PROC dbo.ia_RAG_Foundry
   Chamada:
   EXEC dbo.ia_RAG_Foundry 
   @Pergunta = N'O que é e como utilizar Tabelas Temporais no SQL Server',
-  @TopDocumentos = 5,
+  @TopDocumentos = 8,
   @vModelo = N'gpt-5.6-luna',
   @vTemp = N'1'
+
+  https://sqlserver-expert.hashnode.dev/tabela-temporal-no-sql-server-parte-1-introducao-ao-conceito
+  https://sqlserver-expert.hashnode.dev/tabela-temporal-no-sql-server-parte-2-consultando-dados-historicos
+  https://sqlserver-expert.hashnode.dev/tabela-temporal-no-sql-server-parte-3-boas-praticas-e-limitacoes
 ==============================================================================*/
 @Pergunta nvarchar(2000) = N'Como usar DBCC CHECKDB no SQL Server?',
 @TopDocumentos int = 8,

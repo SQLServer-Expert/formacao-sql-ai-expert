@@ -69,7 +69,7 @@ DECLARE @Pergunta nvarchar(4000) = N'O que é e como utilizar Tabelas Temporais 
 DECLARE @VetorPergunta vector(1536)
 SET @VetorPergunta = AI_GENERATE_EMBEDDINGS (@Pergunta USE MODEL Embedding_3small)
 
-SELECT TOP (5) bc.ChunkId, bp.Titulo, bc.Chunk_Texto, vs.distance as Distancia
+SELECT TOP (8) bc.ChunkId, bp.Titulo, bc.Chunk_Texto, vs.distance as Distancia
 
 FROM VECTOR_SEARCH (
 TABLE      = dbo.BlogChunks as bc,
