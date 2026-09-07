@@ -37,11 +37,11 @@ ORDER BY Total_Chunks DESC
 --DROP EXTERNAL MODEL Embedding_3small
 CREATE EXTERNAL MODEL Embedding_3small
 WITH (
-LOCATION = 'https://fd-lab01.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-01',
+LOCATION = 'https://<nome-foundry>.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-02-01',
 API_FORMAT = 'Azure OpenAI',
 MODEL_TYPE = EMBEDDINGS,
 MODEL = 'text-embedding-3-small',
-CREDENTIAL = [https://fd-lab01.openai.azure.com/])
+CREDENTIAL = [https://<nome-foundry>.openai.azure.com/])
 go
 
 
