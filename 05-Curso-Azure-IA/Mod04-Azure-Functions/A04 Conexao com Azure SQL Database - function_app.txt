@@ -1,0 +1,73 @@
+import azure.functions as func
+import logging
+import json
+import os
+from mssql_python import connect
+
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+
+@app.route(route="get_QtdEmbeddings")
+def get_QtdEmbeddings(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+
+# Recupera a connection string do local.settings.json
+    connection_string = os.getenv("AZURE_SQL_CONNECTIONSTRING")
+
+    if not connection_string:
+        return func.HttpResponse(
+            json.dumps(
+                {"erro": "Connection string não configurada."},
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status_code=500
+        )
+
+    try:
+        # Conecta ao Azure SQL Database
+        with connect(connection_string) as conn:
+
+            with conn.cursor() as cursor:
+
+                # Executa a consulta
+                cursor.execute("""
+                    SELECT COUNT(*) AS Qtd
+                    FROM dbo.BlogChunks
+                    WHERE Embedding IS NULL
+                """)
+
+                # Recupera a única linha retornada
+                row = cursor.fetchone()
+
+                qtd = int(row[0])
+
+        # Define a mensagem de acordo com o resultado
+        if qtd == 0:
+            status = "Não existem embeddings para gerar."
+        else:
+            status = "Existem embeddings para gerar."
+
+        # Monta a resposta JSON
+        resposta = {
+            "qtd": qtd,
+            "status": status
+        }
+
+        return func.HttpResponse(
+            json.dumps(resposta, ensure_ascii=False),
+            mimetype="application/json",
+            status_code=200
+        )
+
+    except Exception:
+        logging.exception("Erro ao consultar o Azure SQL Database.")
+
+        return func.HttpResponse(
+            json.dumps(
+                {"erro": "Erro ao consultar o Azure SQL Database."},
+                ensure_ascii=False
+            ),
+            mimetype="application/json",
+            status_code=500
+        )
