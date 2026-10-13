@@ -1,3 +1,9 @@
+### Instalação do VS Code
+
+**Link para download**:
+[https://code.visualstudio.com/](https://code.visualstudio.com/)
+
+
 ### Instalar as seguintes Extensões:
 - **Python (Microsoft)**: Suporte principal ao desenvolvimento Python.
 - **Pylance**: IntelliSense, validação e autocomplete do Python.
