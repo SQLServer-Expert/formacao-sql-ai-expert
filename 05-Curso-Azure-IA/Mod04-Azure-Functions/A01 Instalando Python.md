@@ -1,8 +1,8 @@
 ### Instalando o Python
 
-Verificar antes a versão mais atual de suporte ao Azure Function, no momento da gravação desta aula a versão mais recente suportada é a 3.12.
+Verificar antes a versão mais atual de suporte ao Azure Function, no momento da gravação desta aula a versão mais recente suportada é a 3.14.
 
-Faça download do Python no link abaixo e escolha a versão:
+Faça download do Python no link abaixo e escolha **"Windows installer (64-bit)"**:
 
 [https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)
 
