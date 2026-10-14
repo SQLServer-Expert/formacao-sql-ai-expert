@@ -3,6 +3,7 @@
 **Link para download**:
 [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
+Escolher System Installer (x64) para instalar para todos os usuários!
 
 ### Instalar as seguintes Extensões:
 - **Python (Microsoft)**: Suporte principal ao desenvolvimento Python.
