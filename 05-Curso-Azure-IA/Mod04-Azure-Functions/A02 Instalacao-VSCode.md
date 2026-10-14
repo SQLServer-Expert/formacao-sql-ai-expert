@@ -5,6 +5,10 @@
 
 Escolher System Installer (x64) para instalar para todos os usuários!
 
+### Configuração do Python no VS Code
+Abrir o VS Code e instalar a extensão **Python (Microsoft)**.
+Após a instalação da extensão pressione **Ctrl + Shift + P** e digite **Python** e selecione **Select Interpreter**. Deve aparecer sua versão de Python, se não aparecer entre com o caminho de instalação (C:\Python311\python.exe).
+
 ### Instalar as seguintes Extensões:
 - **Python (Microsoft)**: Suporte principal ao desenvolvimento Python.
 - **Pylance**: IntelliSense, validação e autocomplete do Python.
