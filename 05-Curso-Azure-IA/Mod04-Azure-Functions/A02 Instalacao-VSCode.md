@@ -10,14 +10,15 @@ Abrir o VS Code e instalar a extensão **Python (Microsoft)**.
 Após a instalação da extensão pressione **Ctrl + Shift + P** e digite **Python** e selecione **Select Interpreter**. Deve aparecer sua versão de Python, se não aparecer entre com o caminho de instalação (C:\Python311\python.exe).
 
 Para testar a configuração, clique no primeiro ícone na barra lateral esquerda (Explorer).
-Criar uma pasta, por exemplo C:\olaMundo e selecionar.
-Crie um arquivo "OlaMundo.py" e entre com o código abaixo:
-
+Criar uma pasta, por exemplo **C:\olaMundo** e selecionar.
+Crie um arquivo **"OlaMundo.py"** e entre com o código abaixo:
+```powershell
 import sys
 
 print("Formação SQL AI Expert")
 print("Versão:", sys.version)
 print("Interpretador:", sys.executable)
+```
 
 ### Instalar as seguintes Extensões:
 - **Python (Microsoft)**: Suporte principal ao desenvolvimento Python.
