@@ -3,7 +3,7 @@
 **Link para download**:
 [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
-Escolher System Installer (x64) para instalar para todos os usuários!
+Clicar em **"Other platforms"** e escolher em Windows **"System Installer (x64)"** para instalar para todos os usuários!
 
 ### Configuração do Python no VS Code
 Abrir o VS Code e instalar a extensão **Python (Microsoft)**.
