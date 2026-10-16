@@ -1,3 +1,4 @@
 >> Editar arquivo local.settings.json
 
-"AZURE_SQL_CONNECTIONSTRING": "Driver={ODBC Driver 18 for SQL Server};Server=tcp:SEU_SERVIDOR.database.windows.net,1433;Database=SEU_BANCO;Uid=SEU_LOGIN;Pwd=SUA_SENHA;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+"AZURE_SQL_CONNECTIONSTRING": "Server=tcp:SEU_SERVIDOR.database.windows.net,1433;Database=SEU_BANCO;UID=SEU_LOGIN;PWD=SUA_SENHA;Encrypt=yes;TrustServerCertificate=no;"
+
