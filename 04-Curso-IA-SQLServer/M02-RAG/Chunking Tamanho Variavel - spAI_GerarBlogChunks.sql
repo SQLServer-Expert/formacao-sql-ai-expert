@@ -167,7 +167,7 @@ BEGIN
 
         ;WITH Secoes AS (
         SELECT NumeroLinha,
-               SUM(CONVERT(int, EhCabecalho)) OVER (ORDER BY NumeroLinhaROWS UNBOUNDED PRECEDING) AS NumeroSecao
+               SUM(CONVERT(int, EhCabecalho)) OVER (ORDER BY NumeroLinha ROWS UNBOUNDED PRECEDING) AS NumeroSecao
         FROM #Linhas)
 
         UPDATE l SET SecaoNumero = s.NumeroSecao
