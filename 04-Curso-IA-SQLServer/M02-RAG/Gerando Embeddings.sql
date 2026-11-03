@@ -33,11 +33,13 @@ MODEL = 'embeddinggemma'
 -- Consultando Metadata
 SELECT * FROM sys.external_models
 
-
+SELECT * FROM dbo.BlogChunks_PorTamanho
+SELECT * FROM dbo.BlogChunks
 
 /***************************************************
  Gerar Embeddings  para Chunks de tamanho fixo
 ****************************************************/
+-- UPDATE dbo.BlogChunks_PorTamanho SET Embedding = null
 UPDATE dbo.BlogChunks_PorTamanho
 SET Embedding = AI_GENERATE_EMBEDDINGS(Chunk_Texto USE MODEL EmbeddingGemma)
 WHERE Embedding is null
@@ -54,6 +56,7 @@ SELECT * FROM dbo.BlogChunks_PorTamanho with (nolock)
 /***************************************************
  Gerar Embeddings  para Chunks de tamanho variável
 ****************************************************/
+-- UPDATE dbo.BlogChunks SET Embedding = null
 UPDATE dbo.BlogChunks
 SET Embedding = AI_GENERATE_EMBEDDINGS(Chunk_Texto USE MODEL EmbeddingGemma)
 WHERE Embedding is null
