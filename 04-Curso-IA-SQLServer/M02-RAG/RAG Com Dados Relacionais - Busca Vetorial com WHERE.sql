@@ -61,7 +61,7 @@ Produto_ID	Preco	Categoria	Embedding_Texto
 
  - Filtro WHERE resolvido depois no Clustered Index Seek.
 ************************************************************/
- DROP INDEX IF EXISTS IX_dbo_Produto_Embedding ON dbo.Produto_Embedding
+DROP INDEX IF EXISTS IX_dbo_Produto_Embedding ON dbo.Produto_Embedding
 go
 CREATE VECTOR INDEX IX_dbo_Produto_Embedding
 ON dbo.Produto_Embedding (Embedding)
