@@ -61,6 +61,14 @@ Produto_ID	Preco	Categoria	Embedding_Texto
 
  - Filtro WHERE resolvido depois no Clustered Index Seek.
 ************************************************************/
+ DROP INDEX IF EXISTS IX_dbo_Produto_Embedding ON dbo.Produto_Embedding
+go
+CREATE VECTOR INDEX IX_dbo_Produto_Embedding
+ON dbo.Produto_Embedding (Embedding)
+WITH (METRIC = 'cosine', TYPE = 'diskann')
+go
+ 
+-- Busca Vetorial Aproximada
 go
 DECLARE @Pergunta varchar(2000) = 'Qual a melhor bicipleta para pedalar no meio do mato, em caminhos de terra e pedra'
 DECLARE @Top int = 5
