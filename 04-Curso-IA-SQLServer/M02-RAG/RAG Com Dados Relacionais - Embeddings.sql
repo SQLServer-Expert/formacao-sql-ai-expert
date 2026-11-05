@@ -18,6 +18,8 @@ Autor: Landry Duailibe | SQL Server Expert
 use AdventureWorks_RAG
 go
 
+-- Habilitar preview features (necessário no SQL Server 2025)
+ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON
 
 /**********************************************
  Analisando dados da tabela Produto
