@@ -60,8 +60,9 @@ go
 DROP INDEX IF EXISTS IX_dbo_Produto_Embedding ON dbo.Produto_Embedding
 go
 
-
-
+-- Exclui Indice Vetorial
+DROP INDEX IF EXISTS IX_dbo_Produto_Embedding ON dbo.Produto_Embedding
+go
 /*************************************************
  Cria tabela de Controle para Change Tracking
 **************************************************/
