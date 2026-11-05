@@ -26,7 +26,7 @@ go
 
  - Filtro WHERE resolvido no Clustered Index Scan
 *****************************************************/
-DECLARE @Pergunta nvarchar(2000) = N'Qual a melhor bicipleta para pedalar no meio do mato, em caminhos de terra e pedra'
+DECLARE @Pergunta nvarchar(2000) = N'Qual a melhor bicicleta para pedalar no meio do mato, em caminhos de terra e pedra'
 DECLARE @Top int = 5
 DECLARE @Preco_INI money = 500.0
 DECLARE @Preco_FIM money = 1000.0
@@ -70,7 +70,7 @@ go
  
 -- Busca Vetorial Aproximada
 go
-DECLARE @Pergunta varchar(2000) = 'Qual a melhor bicipleta para pedalar no meio do mato, em caminhos de terra e pedra'
+DECLARE @Pergunta varchar(2000) = 'Qual a melhor bicicleta para pedalar no meio do mato, em caminhos de terra e pedra'
 DECLARE @Top int = 5
 DECLARE @Preco_INI money = 500.0
 DECLARE @Preco_FIM money = 1000.0
